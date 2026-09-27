@@ -52,7 +52,9 @@ const cy = cytoscape({
             selector: "node[riskScore < 0.30]",
 
             style: {
-                "background-color": "green"
+                "background-color": "green",
+                "width": "35px",
+                "height": "35px"
             }
         },
 
@@ -62,7 +64,9 @@ const cy = cytoscape({
             selector: "node[riskScore >= 0.30][riskScore < 0.70]",
 
             style: {
-                "background-color": "orange"
+                "background-color": "orange",
+                "width": "45px",
+                "height": "45px"
             }
         },
 
@@ -72,7 +76,9 @@ const cy = cytoscape({
             selector: "node[riskScore >= 0.70]",
 
             style: {
-                "background-color": "red"
+                "background-color": "red",
+                "width": "55px",
+                "height": "55px"
             }
         },
 
