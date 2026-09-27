@@ -1,0 +1,34 @@
+body {
+    font-family: Arial;
+}
+
+#risk {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#network {
+    width: 700px;
+    height: 300px;
+    border: 1px solid black;
+    margin-top: 20px;
+    padding: 20px;
+}
+
+#controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+button {
+    padding: 4px 10px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#cy
+{
+    width : 100%;
+    height : 220px;
+}

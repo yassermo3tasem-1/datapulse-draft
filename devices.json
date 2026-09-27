@@ -1,0 +1,35 @@
+{
+    "nodes": [
+        {
+            "id": "pc1",
+            "label": "PC-01",
+            "ip": "192.168.1.10",
+            "riskScore": 0.87
+        },
+        {
+            "id": "router",
+            "label": "Router",
+            "ip": "192.168.1.1",
+            "riskScore": 0.20
+        },
+        {
+            "id": "server1",
+            "label": "Server-01",
+            "ip": "192.168.1.20",
+            "riskScore": 0.55
+        }
+    ],
+
+    "edges": [
+        {
+            "id": "edge1",
+            "source": "pc1",
+            "target": "router"
+        },
+        {
+            "id": "edge2",
+            "source": "router",
+            "target": "server1"
+        }
+    ]
+}

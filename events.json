@@ -1,0 +1,16 @@
+{
+    "events": [
+        {
+            "nodeId": "server1",
+            "riskScore": 0.91
+        },
+        {
+            "nodeId": "router",
+            "riskScore": 0.65
+        },
+        {
+            "nodeId": "pc1",
+            "riskScore": 0.15
+        }
+    ]
+}
