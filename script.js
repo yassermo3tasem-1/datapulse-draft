@@ -12,7 +12,8 @@ function showRisk(score) {
 // 2. REFRESH BUTTON
 // -------------------------
 
-const refreshButton = document.getElementById("refreshButton");
+const refreshButton =
+    document.getElementById("refreshButton");
 
 
 // -------------------------
@@ -40,9 +41,7 @@ const cy = cytoscape({
             style: {
                 "label": "data(label)",
                 "color": "white",
-                "background-color": "gray",
-                "width": "40px",
-                "height": "40px"
+                "background-color": "gray"
             }
         },
 
@@ -53,20 +52,21 @@ const cy = cytoscape({
 
             style: {
                 "background-color": "green",
-                "width": "35px",
-                "height": "35px"
+                "width": 30,
+                "height": 30
             }
         },
 
 
         // Medium risk
         {
-            selector: "node[riskScore >= 0.30][riskScore < 0.70]",
+            selector:
+                "node[riskScore >= 0.30][riskScore < 0.70]",
 
             style: {
                 "background-color": "orange",
-                "width": "45px",
-                "height": "45px"
+                "width": 45,
+                "height": 45
             }
         },
 
@@ -77,8 +77,8 @@ const cy = cytoscape({
 
             style: {
                 "background-color": "red",
-                "width": "55px",
-                "height": "55px"
+                "width": 60,
+                "height": 60
             }
         },
 
@@ -147,6 +147,9 @@ function updateNodeRisk(nodeId, newRisk) {
 
     node.data("riskScore", newRisk);
 
+
+    // Only refresh the displayed score
+    // if this is the node the user selected
     if (node.selected()) {
         showRisk(newRisk);
     }
@@ -161,57 +164,103 @@ async function loadEvents() {
 
     try {
 
-        const response = await fetch("./events.json");
+        const response =
+            await fetch("./events.json");
 
 
+        // HTTP validation
         if (!response.ok) {
-            throw new Error("HTTP error: " + response.status);
-        }
-
-
-        const data = await response.json();
-
-        if (!Array.isArray(data.events)) {
-            throw new Error ("invalid events data format");
-        }
-
-        const invalidEvent = data.events.find(function (event ) {
-            return (
-                typeof event.nodeId !== "string" || 
-                typeof event.riskScore !== "number" || 
-                event.riskScore < 0 ||
-                event.riskScore > 1
+            throw new Error(
+                "HTTP error: " + response.status
             );
-        });
-
-        if(invalidEvent) {
-            throw new Error ("invalid event data");
         }
 
 
-        console.log("Events data:", data);
+        // Parse JSON
+        const data =
+            await response.json();
 
-        const unknownEvent = data.events.find(function (event) {
 
-            const node = cy.getElementById(event.nodeId);
+        // Check overall event structure
+        if (!Array.isArray(data.events)) {
+            throw new Error(
+                "Invalid events data format"
+            );
+        }
 
-            return node.length === 0;
-        });
+
+        // Validate every event
+        const invalidEvent =
+            data.events.find(function (event) {
+
+                return (
+                    typeof event.nodeId !== "string" ||
+                    typeof event.riskScore !== "number" ||
+                    event.riskScore < 0 ||
+                    event.riskScore > 1
+                );
+
+            });
+
+
+        if (invalidEvent) {
+            throw new Error(
+                "Invalid event data"
+            );
+        }
+
+
+        // Check that every event references
+        // a node that already exists
+        const unknownEvent =
+            data.events.find(function (event) {
+
+                const node =
+                    cy.getElementById(event.nodeId);
+
+                return node.length === 0;
+
+            });
+
 
         if (unknownEvent) {
-            throw new Error("Event references unknown node");
+            throw new Error(
+                "Event references unknown node"
+            );
         }
 
-        data.events.forEach(function(event) {
-            updateNodeRisk(event.nodeId, event.riskScore);
+
+        console.log(
+            "Events data:",
+            data
+        );
+
+
+        // Apply events only after
+        // the whole batch has been validated
+        data.events.forEach(function (event) {
+
+            updateNodeRisk(
+                event.nodeId,
+                event.riskScore
+            );
+
         });
 
     }
 
     catch (error) {
 
-        console.error("Failed to load events:", error);
+        console.error(
+            "Failed to load events:",
+            error
+        );
 
+
+        document.getElementById(
+            "statusMessage"
+        ).textContent =
+            "Failed to load event updates.";
     }
 }
 
@@ -223,37 +272,49 @@ async function loadEvents() {
 async function loadDevices() {
 
     // Loading state
-    document.getElementById("statusMessage").textContent =
+    document.getElementById(
+        "statusMessage"
+    ).textContent =
         "Loading network data...";
 
-    document.getElementById("controls").style.display = "none";
+
+    document.getElementById(
+        "controls"
+    ).style.display = "none";
+
 
     refreshButton.disabled = true;
 
 
     try {
 
-        console.log("loadDevices started");
+        console.log(
+            "loadDevices started"
+        );
 
 
-        // Fetch network data
-        const response = await fetch("./devices.json");
+        // Fetch initial network data
+        const response =
+            await fetch("./devices.json");
 
-        console.log("HTTP status:", response.status);
+
+        console.log(
+            "HTTP status:",
+            response.status
+        );
 
 
         // HTTP validation
         if (!response.ok) {
-
             throw new Error(
                 "HTTP error: " + response.status
             );
-
         }
 
 
-        // Convert JSON into JavaScript data
-        const data = await response.json();
+        // Parse JSON
+        const data =
+            await response.json();
 
 
         // -------------------------
@@ -269,7 +330,6 @@ async function loadDevices() {
             throw new Error(
                 "Invalid network data format"
             );
-
         }
 
 
@@ -281,18 +341,18 @@ async function loadDevices() {
                     typeof node.id !== "string" ||
                     typeof node.label !== "string" ||
                     typeof node.ip !== "string" ||
-                    typeof node.riskScore !== "number"
+                    typeof node.riskScore !== "number" ||
+                    node.riskScore < 0 ||
+                    node.riskScore > 1
                 );
 
             });
 
 
         if (invalidNode) {
-
             throw new Error(
                 "Invalid node data"
             );
-
         }
 
 
@@ -310,15 +370,13 @@ async function loadDevices() {
 
 
         if (invalidEdge) {
-
             throw new Error(
                 "Invalid edge data"
             );
-
         }
 
 
-        // Collect node IDs
+        // Collect all node IDs
         const nodeIds =
             data.nodes.map(function (node) {
 
@@ -340,11 +398,9 @@ async function loadDevices() {
 
 
         if (brokenEdge) {
-
             throw new Error(
                 "Edge references unknown node"
             );
-
         }
 
 
@@ -374,7 +430,10 @@ async function loadDevices() {
         }
 
 
-        console.log("Data:", data);
+        console.log(
+            "Data:",
+            data
+        );
 
 
         // -------------------------
@@ -416,13 +475,12 @@ async function loadDevices() {
         cy.add(edgeElements);
 
 
-        // Arrange nodes
         cy.layout({
             name: "grid"
         }).run();
 
 
-        // Store graph nodes
+        // Cytoscape now contains the nodes
         graphNodes =
             cy.nodes().toArray();
 
@@ -457,8 +515,8 @@ async function loadDevices() {
         // MOCK EVENT REQUEST
         // -------------------------
 
-        // Pretend that the frontend asks
-        // for events 3 seconds later
+        // Pretend new backend event data
+        // is requested 3 seconds later
         setTimeout(function () {
 
             loadEvents();
@@ -506,7 +564,8 @@ cy.on(
     "node",
     function (event) {
 
-        const node = event.target;
+        const node =
+            event.target;
 
 
         currentNodeIndex =
@@ -535,8 +594,6 @@ refreshButton.addEventListener(
     "click",
     function () {
 
-        // Do nothing if nodes
-        // have not loaded yet
         if (graphNodes.length === 0) {
             return;
         }
